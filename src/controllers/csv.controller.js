@@ -145,17 +145,17 @@ export const deleteCsv = async(req,res)=>{
 
     try {
         // Get the _id of the document to delete from the URL params
-        const { id } = req.body;
+        const { userId } = req.body;
     
         // Check if the id is provided
-        if (!id) {
+        if (!userId) {
           return res.status(400).json({
             message: 'User ID is required',
           });
         }
     
         // Try to find and delete the BugData document by ID
-        const deletedUser = await BugData.findByIdAndDelete(id);
+        const deletedUser = await BugData.findByIdAndDelete(userId);
     
         // If no document is found, return a 404 error
         if (!deletedUser) {
@@ -220,10 +220,10 @@ export const fetchUser = async(req,res) =>{
 
     try {
         // Get the user ID from the request parameters
-        const { id } = req.body;
+        const { userId } = req.body;
     
         // Find the user by their ID
-        const user = await BugData.findById(id);
+        const user = await BugData.findById(userId);
     
         // If no user is found with the given ID, return a 404 error
         if (!user) {
@@ -257,9 +257,9 @@ export const Addcourses = async(req,res)=>{
 
 
 
-    const {_id,courseName} = req.body;
+    const {userId,courseName} = req.body;
 
-    if(!_id||!courseName){
+    if(!userId||!courseName){
 
         return res.status(400).json({
 
@@ -268,7 +268,7 @@ export const Addcourses = async(req,res)=>{
     }
 
     //find the user by his id 
-    const user = await BugData.findById(_id);
+    const user = await BugData.findById(userId);
 
     if(!user){
 
