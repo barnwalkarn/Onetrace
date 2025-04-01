@@ -45,7 +45,7 @@ export const uploadCsv = async (req, res) => {
       });
     }
     // Define the full path to the uploaded file in the 'uploads' folder
-    const filePath = path.Ijoin(__dirnamePath, 'upload', file.filename);
+    const filePath = path.join(__dirnamePath, 'upload', file.filename);
      // Log the resolved file path for debugging
     console.log("Resolved file path:", filePath);  // This should print the exact file path
     // // Check if the file exists at the resolved path
