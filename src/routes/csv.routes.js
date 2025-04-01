@@ -13,6 +13,7 @@ import { addActivities,
          deleteCsv, 
          fetchCsv, 
          fetchUser, 
+         updateCsv, 
          uploadCsv } from '../controllers/csv.controller.js';  
 
 const router = express.Router();
@@ -35,12 +36,14 @@ const upload = multer({ storage: storage });
 
 router.use(authenticateAdmin)
 router.post('/upload', upload.single('csv'), uploadCsv);  // Upload CSV
+router.put('/update', upload.single('csv'), updateCsv); 
 router.get('/fetch',fetchCsv)
 router.get('/fetchUser',fetchUser)
 
 router.delete('/deleteUser',deleteCsv)
 router.delete('/deleteAll',deleteAllCsv)
 router.post('/addCourse',Addcourses)
+
 
 router.delete('/deleteCourse',deletecourse)
 

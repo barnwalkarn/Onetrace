@@ -44,17 +44,11 @@ export const uploadCsv = async (req, res) => {
         message: 'No file uploaded',
       });
     }
-
-
-
-
     // Define the full path to the uploaded file in the 'uploads' folder
-    const filePath = path.join(__dirnamePath, 'upload', file.filename);
-
-    // Log the resolved file path for debugging
+    const filePath = path.Ijoin(__dirnamePath, 'upload', file.filename);
+     // Log the resolved file path for debugging
     console.log("Resolved file path:", filePath);  // This should print the exact file path
-
-    // Check if the file exists at the resolved path
+    // // Check if the file exists at the resolved path
     try {
       await fs.access(filePath);  // Use promise-based fs.access
     } catch (err) {
@@ -482,4 +476,95 @@ export const addActivities = async (req, res) => {
       });
     }
   };
+
+
+
+// Update csv
+
+  export const updateCsv = async (req, res) => {
+    try {
+      const { userId, username, teamname } = req.body;
+      const file = req.file;
+  
+      // Ensure userId is provided
+      if (!userId) {
+        return res.status(400).json({ message: 'User ID is required.' });
+      }
+  
+      // Find existing record by userId
+      let existingData = await BugData.findById(userId);
+  
+      if (!existingData) {
+        return res.status(404).json({
+          message: 'No record found for the given user ID.',
+        });
+      }
+  
+      let updatedFields = {};
+  
+      // Update username if provided
+      if (username) {
+        updatedFields.username = username;
+      }
+  
+      // Update teamname if provided
+      if (teamname) {
+        updatedFields.teamname = teamname;
+      }
+  
+      // Process CSV file if provided
+      if (file) {
+        const filePath = path.join(__dirnamePath, 'upload', file.filename);
+  
+        try {
+          await fs.access(filePath);
+        } catch (err) {
+          return res.status(500).json({
+            message: 'CSV file not found at the expected path.',
+            error: err.message,
+          });
+        }
+  
+        // Convert CSV to JSON
+        const jsonData = await csv().fromFile(filePath);
+        console.log('CSV Conversion Done:', jsonData);
+  
+        // Convert to required format
+        const bugData = jsonData.map(item => ({
+          bugid: item.ID,
+          title: item.Title,
+          severity: item.Severity,
+          createdDate: item['Created Date'],
+        }));
+  
+        updatedFields.bugs = bugData;
+  
+        // Delete the file after processing
+        await fs.unlink(filePath);
+        console.log('File deleted');
+      }
+  
+      // Update database record
+      const updatedBugData = await BugData.findByIdAndUpdate(
+        userId,
+        { $set: updatedFields },
+        { new: true }
+      );
+  
+      res.status(200).json({
+        message: 'Data updated successfully',
+        _id: updatedBugData._id,
+        username: updatedBugData.username,
+        teamname: updatedBugData.teamname,
+        bugs: updatedBugData.bugs,
+      });
+    } catch (error) {
+      console.error('Error during update:', error);
+      res.status(500).json({
+        message: 'Error updating data. Please check input fields.',
+        error: error.message,
+      });
+    }
+  };
+  
   
